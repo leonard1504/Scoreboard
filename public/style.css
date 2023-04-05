@@ -1,0 +1,77 @@
+html {
+  height: 100%;
+  width: 100%;
+  font-family: 'Fira Sans', sans-serif;
+  background: #121212;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.scoreboard {
+  width: max-content;
+}
+
+#scoreboard-elements {
+  margin: 0;
+  padding-inline-start: 0;
+  margin-block-start: 0;
+}
+
+.rank {
+  font-size: 2rem;
+  margin: 10px;
+}
+
+.player {
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  height: max-content;
+  width: 100%;
+  z-index: 1;
+  backface-visibility: hidden;
+  position: relative;
+  margin-bottom: 15px;
+  background: #161616;
+}
+
+.player .playerinfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.player img {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 15px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.player .NameAndStats {
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.AdminButtons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.AdminButtons i {
+  padding-bottom: 20px;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.AdminButtons i:hover {
+  opacity: 1;
+}

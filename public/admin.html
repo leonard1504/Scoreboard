@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Scoreboard</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1 style="color: white;">Scoreboard</h1>
+    <div class="scoreboard">
+      <ol id="scoreboard-elements">
+        <!--Hier werden die Spieler reingeladen-->
+      </ol>
+    </div>
+  </div>
+  <script>
+    const delay = ms => new Promise(res => setTimeout(res, ms));  
+
+    const scoreboardLoaded = new CustomEvent('scoreboardLoaded', {
+      detail: {
+        message: 'Scoreboard loaded!'
+      }
+    });
+
+    async function getScoreboard() {
+      const response = await fetch('/getscoreboard');
+      console.log(await response);
+      const list = await response.json();
+      console.log(await list);
+      let i = 1;
+      for(element of list) {
+        let li_player = document.createElement('li');
+        let div_playerinfo = document.createElement('div');
+        let p_rank = document.createElement('p');
+        let img = document.createElement('img');
+        let div_NameAndStats = document.createElement('div');
+        let h2 = document.createElement('h2');
+        let p_WinsAndLoses = document.createElement('p');
+        let div_admin = document.createElement('div');
+        let a_increase = document.createElement('a');
+        let a_decrease = document.createElement('a');
+        let a_delete = document.createElement('a');
+
+        div_admin.id = element.id;
+        div_admin.classList.add("AdminButtons");
+
+        a_increase.innerHTML = '<i class="fa-solid fa-plus fa-lg" style="color: #20d92d;"></i>';
+        a_increase.classList.add("inc");
+        a_increase.href = "#";
+        a_decrease.innerHTML = '<i class="fa-solid fa-minus fa-lg" style="color: #d01616;"></i>';
+        a_decrease.classList.add("dec");
+        a_decrease.href = "#";
+        a_delete.innerHTML = '<i class="fa-solid fa-trash-can fa-lg" style="color: #d01616;"></i>';
+        a_delete.classList.add("del");
+        a_delete.href = "#";
+
+        div_admin.append(a_increase);
+        div_admin.append(a_decrease);
+        div_admin.append(a_delete);
+
+        li_player.classList.add("player");
+        li_player.id = element.id;
+      
+        div_playerinfo.classList.add("playerinfo");
+        div_playerinfo.style.color = element.color;
+      
+        p_rank.classList.add("rank");
+        p_rank.innerText = i;
+        p_rank.style.color = element.color;
+        div_playerinfo.append(p_rank);
+
+        img.src = element.img;
+        div_playerinfo.append(img);
+
+        div_NameAndStats.classList.add("NameAndStats");
+        h2.innerText = element.name;
+        let gv = 0;
+        if(element.wins+element.lose !== 0) { gv = (element.wins/(element.wins+element.lose)*100).toFixed(2); }
+        p_WinsAndLoses.innerText = `${element.wins}x Gewonnen ${element.lose}x Verloren G/V ${gv}%`;
+        div_NameAndStats.append(h2);
+        div_NameAndStats.append(p_WinsAndLoses);
+        div_playerinfo.append(div_NameAndStats);
+
+        li_player.append(div_playerinfo);
+        let rgb = hexToRgb(element.color);
+        li_player.style.boxShadow = `0px 0px 0 rgb(${rgb.r}, ${rgb.g}, ${rgb.b}),
+0px 0px 4px rgb(${rgb.r*0.95}, ${rgb.g*0.95}, ${rgb.b*0.95}),
+0px 0px 8px rgb(${rgb.r*0.9}, ${rgb.g*0.9}, ${rgb.b*0.9}),
+0px 0px 16px rgb(${rgb.r*0.85}, ${rgb.g*0.85}, ${rgb.b*0.85})`;
+
+        let scoreboard = document.getElementById('scoreboard-elements');
+        scoreboard.append(li_player);
+        li_player.append(div_admin);
+        
+        i++;
+      }
+      window.dispatchEvent(scoreboardLoaded);
+    }
+    getScoreboard();
+
+    document.addEventListener('scoreboardLoaded', async function(event) {
+      console.log(event.detail.message);
+      const increaseButtons = await document.querySelectorAll('.inc');
+      const decreaseButtons = await document.querySelectorAll('.dec');
+      const deleteButtons = await document.querySelectorAll('.del');
+      console.log(deleteButtons)
+
+      increaseButtons.forEach(function(increaseButton) {
+        increaseButton.addEventListener('click', async function(event) {
+          const parentID = event.target.parentElement.id;
+          await changeDB(parentID, "increase");
+          window.location.href = "/AdminPage";
+        });
+      });
+
+      decreaseButtons.forEach(function(decreaseButton) {
+        decreaseButton.addEventListener('click', async function(event) {
+          const parentID = event.target.parentElement.id;
+          await changeDB(parentID, "decrease");
+          window.location.href = "/AdminPage";
+        });
+      });
+
+      deleteButtons.forEach(function(deleteButton) {
+        deleteButton.addEventListener('click', async function(event) {
+          console.log("Delete");
+          const parentID = event.target.parentElement.id;
+          await changeDB(parentID, "delete");
+          window.location.href = "/AdminPage";
+        });
+      });
+    });
+
+    async function changeDB(id, action) {
+      let checkDB = {
+            id: id,
+            action: action
+      }
+      const options = {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(checkDB)
+      };
+      let response = await fetch('/getdb', options);
+    }
+
+    function hexToRgb(hex) {
+      // Remove the # character if it exists
+      hex = hex.replace('#', '');
+
+      // Parse the hex values for red, green, and blue
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+
+      // Return the decimal values as separate variables
+      return {
+        r: r,
+        g: g,
+        b: b
+      };
+    }
+  </script>
+</body>
+
+</html>

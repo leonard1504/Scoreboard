@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Scoreboard</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Account Erstellung</h1>
+    <div id="accWindow">
+      <form>
+        <input type="color" id="color" required>
+        <input type="file" id="img" accept="image/gif, image/jpeg, image/png" required>
+        <input type="text" id="name" required>
+        <input type="submit" value="Erstellen" onclick="sendAccount()">
+      </form>
+    </div>
+  </div>
+</body>
+<script>
+  let img = document.getElementById("img");
+  let GeneratedBase64String = "";
+  img.addEventListener('change', function () {
+    // Create a new file reader
+    const reader = new FileReader();
+
+    // Read the selected file as a Data URL (which is a base64-encoded string)
+    reader.readAsDataURL(img.files[0]);
+
+    // When the file is loaded, do something with the base64 string
+    reader.onload = function () {
+      const base64String = reader.result;
+      // Do something with the base64 string, such as sending it to a server
+      // using an AJAX request or posting it to a form
+      GeneratedBase64String = base64String;
+    };
+  });
+
+  async function sendAccount() {
+    console.log("HEY!");
+    let color = document.getElementById("color").value.toString();
+    let name = document.getElementById("name").value.toString();
+    if(color && name && img) {
+        let checkAcc = {
+            color: color,
+            name: name,
+            img: GeneratedBase64String
+        }
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(checkAcc)
+        };
+        let response = await fetch('/getaccount', options);
+        window.location.href = "/";
+    }
+  }
+</script>
+
+</html>
