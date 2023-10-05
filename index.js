@@ -4,7 +4,7 @@ var fs = require('fs');
 const path = require('path');
 const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectId;
-const mongourl = `mongodb+srv://discord:pvrpl3J3ans1stT0ll!@discordbot.fjqyf.mongodb.net/?retryWrites=true&w=majority`;
+const mongourl = `mongodb+srv://discord:[INSERTPASS]@discordbot.fjqyf.mongodb.net/?retryWrites=true&w=majority`;
 
 const app = express();
 const port = process.env.PORT || 80;
